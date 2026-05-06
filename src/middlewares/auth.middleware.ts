@@ -1,9 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
+import { fromNodeHeaders } from 'better-auth/node';
+import { NextFunction, Request, Response } from 'express';
 import { auth } from '../lib/auth';
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const session = await auth.api.getSession({
-    headers: req.headers,
+    headers: fromNodeHeaders(req.headers),
   });
 
   if (!session) {

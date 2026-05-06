@@ -1,4 +1,12 @@
-// Prisma configuration or extensions can go here
-export default {
-  // Config options
-};
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { defineConfig } from 'prisma/config';
+
+dotenv.config();
+
+export default defineConfig({
+  schema: path.join('prisma', 'schema.prisma'),
+  datasource: {
+    url: process.env.DATABASE_URL as string,
+  },
+});
