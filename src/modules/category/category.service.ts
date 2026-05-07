@@ -1,14 +1,25 @@
+import cache from '../../config/cache';
 import prisma from '../../lib/prisma';
 import AppError from '../../shared/appError';
 import { ICategory } from './category.interface';
 
 const getAllCategories = async () => {
+  const cacheKey = 'categories:all';
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
     include: {
       _count: { select: { jobs: true } },
     },
   });
+
+  cache.set(cacheKey, categories, 300); // cache for 5 minutes
+
   return categories;
 };
 
@@ -25,6 +36,8 @@ const createCategory = async (payload: ICategory) => {
     data: payload,
   });
 
+  cache.delete('categories:all'); // invalidate cache
+
   return category;
 };
 
@@ -40,6 +53,8 @@ const updateCategory = async (id: string, payload: Partial<ICategory>) => {
     data: payload,
   });
 
+  cache.delete('categories:all'); // invalidate cache
+
   return category;
 };
 
@@ -51,6 +66,8 @@ const deleteCategory = async (id: string) => {
   }
 
   await prisma.category.delete({ where: { id } });
+
+  cache.delete('categories:all'); // invalidate cache
 };
 
 export const CategoryService = {

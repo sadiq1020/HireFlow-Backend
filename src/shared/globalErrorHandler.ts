@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import { deleteFromCloudinary } from "../config/cloudinary";
+import logger from '../config/logger';
 
 const PRISMA_NOT_FOUND_CODES = ["P2025", "P2001", "P2015", "P2018"];
 const PRISMA_CONFLICT_CODES = ["P2002"];
@@ -51,9 +52,15 @@ const globalErrorHandler = (
 ) => {
   const isDev = process.env.NODE_ENV === "development";
 
-  if (isDev) {
-    console.error("🔴 Global Error Handler caught:", err);
-  }
+  // if (isDev) {
+  //   console.error("🔴 Global Error Handler caught:", err);
+  // }
+
+  logger.error('Global Error Handler caught', {
+  message: err.message,
+  stack: err.stack,
+  statusCode: err.statusCode || 500,
+});
   // If a file was uploaded to Cloudinary but the request failed,
   // delete the orphaned file so we don't accumulate unused uploads
   if (req.file && (req.file as any).path) {

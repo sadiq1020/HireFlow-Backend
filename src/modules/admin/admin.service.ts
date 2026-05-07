@@ -1,9 +1,18 @@
 import { ApprovalStatus } from '../../../generated/prisma';
+import cache from '../../config/cache';
 import prisma from '../../lib/prisma';
 import AppError from '../../shared/appError';
 
 
+
 const getStats = async () => {
+  const cacheKey = 'admin:stats';
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
   const [
     totalUsers,
     totalCompanies,
@@ -20,7 +29,7 @@ const getStats = async () => {
     prisma.companyProfile.count({ where: { approvalStatus: 'PENDING' } }),
   ]);
 
-  return {
+  const stats = {
     totalUsers,
     totalCompanies,
     totalJobs,
@@ -28,6 +37,10 @@ const getStats = async () => {
     totalCategories,
     pendingCompanies,
   };
+
+  cache.set(cacheKey, stats, 120); // cache for 2 minutes
+
+  return stats;
 };
 
 const getEnrollmentTrend = async () => {
