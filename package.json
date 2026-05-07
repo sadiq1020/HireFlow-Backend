@@ -4,11 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "seed": "npx tsx prisma/seed.ts"
-  },
+  "dev": "npx tsx watch src/server.ts",
+  "start": "npx tsx src/server.ts",
+  "seed": "npx tsx prisma/seed.ts"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

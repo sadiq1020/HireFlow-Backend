@@ -1,12 +1,10 @@
-import { PrismaClient } from '../generated/prisma';
+import 'dotenv/config';
 import { auth } from '../src/lib/auth';
-
-const prisma = new PrismaClient();
+import prisma from '../src/lib/prisma';
 
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ── Seed Admin ─────────────────────────────────────────────────
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
   const adminName = process.env.ADMIN_NAME;
@@ -38,7 +36,6 @@ async function main() {
     console.log(`ℹ️  Admin already exists: ${adminEmail}`);
   }
 
-  // ── Seed Categories ────────────────────────────────────────────
   const categories = [
     { name: 'Engineering', icon: '⚙️' },
     { name: 'Design', icon: '🎨' },
@@ -60,13 +57,11 @@ async function main() {
 
   console.log(`✅ ${categories.length} categories seeded`);
   console.log('🎉 Seeding complete');
+
+  await prisma.$disconnect();
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Seed failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error('❌ Seed failed:', e);
+  process.exit(1);
+});
