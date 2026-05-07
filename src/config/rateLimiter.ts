@@ -13,11 +13,11 @@ export const globalRateLimiter = rateLimit({
 
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10, // stricter limit for auth routes
+  max: 200, // increase from 10 to 200
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many login attempts, please try again after 15 minutes.',
+    message: 'Too many requests, please try again after 15 minutes.',
   },
 });

@@ -28,7 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(globalRateLimiter);
 
 // Better Auth — stricter rate limit on auth routes
-app.use('/api/auth', authRateLimiter);
+app.use('/api/auth/sign-in', authRateLimiter);
+app.use('/api/auth/sign-up', authRateLimiter);
 app.all('/api/auth/*splat', toNodeHandler(auth));
 
 // Application Routes
