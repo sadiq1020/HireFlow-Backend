@@ -2,10 +2,14 @@ import { toNodeHandler } from 'better-auth/node';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { auth } from './lib/auth';
+import adminRoutes from './modules/admin/admin.route';
+import applicationRoutes from './modules/application/application.route';
 import categoryRoutes from './modules/category/category.route';
 import companyRoutes from './modules/company/company.route';
 import jobRoutes from './modules/job/job.route';
+import savedJobRoutes from './modules/saved-job/savedJob.route';
 import userRoutes from './modules/user/user.route';
+
 
 import globalErrorHandler from './shared/globalErrorHandler';
 
@@ -29,9 +33,9 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/company', companyRoutes);
 app.use('/api/v1/jobs', jobRoutes);
-// app.use('/api/v1/applications', applicationRoutes);
-// app.use('/api/v1/saved-jobs', savedJobRoutes);
-// app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/applications', applicationRoutes);   
+app.use('/api/v1/saved-jobs', savedJobRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // Health check
 app.get('/', (req: Request, res: Response) => {
