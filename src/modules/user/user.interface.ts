@@ -1,4 +1,5 @@
 export interface IUpdateUser {
-  name?: string;
+  name?:  string;
   phone?: string;
+  image?: string; 
 }
