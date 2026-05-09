@@ -14,6 +14,9 @@ import globalErrorHandler from './shared/globalErrorHandler';
 
 const app: Application = express();
 
+// Trust proxy to ensure rate limiter gets the real client IP (e.g. from Vercel)
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(
   cors({
