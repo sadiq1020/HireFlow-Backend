@@ -1,6 +1,7 @@
 import { ApplicationStatus, Role } from '../../../generated/prisma';
 import prisma from '../../lib/prisma';
 import AppError from '../../shared/appError';
+import { QueryBuilder } from '../../shared/QueryBuilder';
 import { ICreateCompany, IUpdateCompany } from './company.interface';
 
 const registerCompany = async (userId: string, payload: ICreateCompany) => {
@@ -67,7 +68,7 @@ const updateMyCompanyProfile = async (userId: string, payload: IUpdateCompany) =
   return updated;
 };
 
-const getCompanyApplications = async (userId: string) => {
+const getCompanyApplications = async (userId: string, query: Record<string, any>) => {
   const company = await prisma.companyProfile.findUnique({
     where: { userId },
   });
@@ -76,11 +77,17 @@ const getCompanyApplications = async (userId: string) => {
     throw new AppError(404, 'Company profile not found');
   }
 
-  const applications = await prisma.application.findMany({
-    where: {
-      job: { companyId: company.id },
-    },
-    include: {
+  const result = await new QueryBuilder(prisma.application, query, {
+    searchableFields: [],
+    filterableFields: ['status', 'jobId'],
+    defaultSortBy: 'createdAt',
+    defaultSortOrder: 'desc',
+  })
+    .filter()
+    .where({ job: { companyId: company.id } })
+    .sort()
+    .paginate()
+    .execute({
       job: {
         select: {
           id: true,
@@ -98,11 +105,9 @@ const getCompanyApplications = async (userId: string) => {
           image: true,
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+    });
 
-  return applications;
+  return result;
 };
 
 const updateApplicationStatus = async (
@@ -139,19 +144,26 @@ const updateApplicationStatus = async (
   return updated;
 };
 
-const getPublicCompanyList = async () => {
-  const companies = await prisma.companyProfile.findMany({
-    where: { approvalStatus: 'APPROVED' },
-    include: {
+const getPublicCompanyList = async (query: Record<string, any>) => {
+  const result = await new QueryBuilder(prisma.companyProfile, query, {
+    searchableFields: ['companyName', 'description', 'location', 'industry'],
+    filterableFields: ['industry'],
+    defaultSortBy: 'createdAt',
+    defaultSortOrder: 'desc',
+  })
+    .search()
+    .filter()
+    .where({ approvalStatus: 'APPROVED' })
+    .sort()
+    .paginate()
+    .execute({
       user: {
         select: { name: true, email: true, image: true },
       },
       _count: { select: { jobs: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+    });
 
-  return companies;
+  return result;
 };
 
 const getPublicCompanyById = async (id: string) => {

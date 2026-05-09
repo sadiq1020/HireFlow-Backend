@@ -16,11 +16,11 @@ const applyToJob = catchAsync(async (req: Request, res: Response) => {
 
 const getMyApplications = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const applications = await ApplicationService.getMyApplications(userId);
+  const result = await ApplicationService.getMyApplications(userId, req.query);
   res.status(200).json({
     success: true,
     message: 'Applications retrieved successfully',
-    data: applications,
+    ...result,
   });
 });
 

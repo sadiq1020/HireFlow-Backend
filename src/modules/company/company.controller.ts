@@ -41,11 +41,11 @@ const updateMyCompanyProfile = catchAsync(async (req: Request, res: Response) =>
 
 const getCompanyApplications = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const applications = await CompanyService.getCompanyApplications(userId);
+  const result = await CompanyService.getCompanyApplications(userId, req.query);
   res.status(200).json({
     success: true,
     message: 'Applications retrieved successfully',
-    data: applications,
+    ...result,
   });
 });
 
@@ -65,11 +65,11 @@ const updateApplicationStatus = catchAsync(async (req: Request, res: Response) =
 });
 
 const getPublicCompanyList = catchAsync(async (req: Request, res: Response) => {
-  const companies = await CompanyService.getPublicCompanyList();
+  const result = await CompanyService.getPublicCompanyList(req.query);
   res.status(200).json({
     success: true,
     message: 'Companies retrieved successfully',
-    data: companies,
+    ...result,
   });
 });
 

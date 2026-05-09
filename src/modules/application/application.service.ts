@@ -1,5 +1,6 @@
 import prisma from '../../lib/prisma';
 import AppError from '../../shared/appError';
+import { QueryBuilder } from '../../shared/QueryBuilder';
 import { ICreateApplication } from './application.interface';
 
 const applyToJob = async (userId: string, payload: ICreateApplication) => {
@@ -50,10 +51,18 @@ const applyToJob = async (userId: string, payload: ICreateApplication) => {
   return application;
 };
 
-const getMyApplications = async (userId: string) => {
-  const applications = await prisma.application.findMany({
-    where: { userId },
-    include: {
+const getMyApplications = async (userId: string, query: Record<string, any>) => {
+  const result = await new QueryBuilder(prisma.application, query, {
+    searchableFields: [],
+    filterableFields: ['status'],
+    defaultSortBy: 'createdAt',
+    defaultSortOrder: 'desc',
+  })
+    .filter()
+    .where({ userId })
+    .sort()
+    .paginate()
+    .execute({
       job: {
         select: {
           id: true,
@@ -70,11 +79,9 @@ const getMyApplications = async (userId: string) => {
           },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+    });
 
-  return applications;
+  return result;
 };
 
 const getApplicationById = async (userId: string, applicationId: string) => {
